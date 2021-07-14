@@ -1,0 +1,623 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+#Import Necessary Libraries
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import scipy as sp
+import missingno as msno
+
+#import necessary dataset
+df = pd.read_csv("telecom_users.csv")
+
+#dimension of dataset
+dimensions = df.shape
+print(dimensions)
+
+#name of columns/variables
+names = df.columns
+print(names)
+
+#info of dataset
+info = df.info()
+print(info)
+
+#descriptive statistics for continous variables
+describe = df.describe().T
+print(describe)
+
+#first 10 part of the dataset
+first_10 = df.head(10)
+
+#last 10 part of the dataset
+last_10 = df.tail(10)
+
+#number of missing data
+df.isnull().sum()
+
+#plot missing data
+msno.bar(df)
+plt.show()
+
+
+#Data Cleaning & Manipulation
+
+#convert TotalCharges from object/string to float
+df.TotalCharges = pd.to_numeric(df.TotalCharges,errors="coerce")
+#TotalChares has missing data
+df.isnull().sum()
+
+#check data type
+df.dtypes
+
+#remove missing values in TotalCharges
+df.dropna(inplace=True)
+#check if missing values is removed
+df.isnull().sum()
+
+#remove unnecessary column/variables ('Unnamed: 0', 'customerID')
+df =df.drop(columns=["Unnamed: 0","customerID"])
+
+
+
+#Exploritory Data Analysis (EDA)
+
+#Bar-Plots
+#gender distribution #gender dist is almost even
+gender_dist = df["gender"].value_counts()
+gender_dist = gender_dist.reset_index()
+gender_dist.columns = ["Gender","Count"]
+print(gender_dist)
+
+sns.catplot(y="Count",x="Gender",data=gender_dist,palette="colorblind",height=5,aspect=2,kind="bar");
+plt.style.use("ggplot")
+plt.title("Figure 1: \n\n  Gender Distribution",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("No.Of Gender",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("Gender",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+#senior citizen dist #majority of the dataset are young
+senior_citzn_dist = df["SeniorCitizen"].value_counts()
+senior_citzn_dist = senior_citzn_dist.reset_index()
+senior_citzn_dist.columns = ["Senior Citizen","Count"]
+print(senior_citzn_dist)
+
+sns.catplot(y="Count",x="Senior Citizen",data= senior_citzn_dist,palette="colorblind",height=5,aspect=2,kind="bar");
+plt.style.use("ggplot")
+plt.title("Figure 2: \n\n Senior Citizen  Distribution",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Senior Citizen",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("No.of Senior Citizen",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#distribution of dependents #Atleast 70% of the customers dont have dependents 
+dependents = df["Dependents"].value_counts()
+dependents = dependents.reset_index()
+dependents.columns = ["Dependent","Count"]
+print(dependents)
+
+sns.catplot(y="Count",x="Dependent",data= dependents,palette="colorblind",height=5,aspect=2,kind="bar");
+plt.style.use("ggplot")
+plt.title("Figure 3: \n\n Dependents Distribution",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Dependents",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("No.Of Customers",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#distribution of partners #Atleast half the customers have partners & the other half dont
+partners = df["Partner"].value_counts()
+partners = partners.reset_index()
+partners.columns = ["Partner", "Count"]
+print(partners)
+
+sns.catplot(y="Count",x="Partner",data= partners,palette="colorblind",height=5,aspect=2,kind="bar");
+plt.style.use("ggplot")
+plt.title("Figure 4: \n\n Partner Distribution",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Partners",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("No.Of Customers",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+ 
+
+#customers with / without dependents and partners 
+df["count"] = 1
+df.groupby(["Partner","Dependents"]).count()["count"].reset_index()
+
+sns.countplot(x="Partner",data = df,hue = "Dependents");
+plt.style.use("ggplot")
+plt.title("Figure 5: \n\n Customers with Partners  And Dependents",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Partners",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("No.Of Customers",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#customers with / without dependents by gender
+df["count"] = 1
+df.groupby(["Dependents","gender"]).count()["count"].reset_index()
+
+sns.countplot(x="gender",data = df,hue = "Dependents");
+plt.style.use("ggplot")
+plt.title("Figure 6: \n\n Customers With/Without Dependents By Gender",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Gender",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("No.Of Customers",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#senior citizen by gender
+df["count"] = 1
+df.groupby(["SeniorCitizen","gender"]).count()["count"].reset_index()
+
+sns.countplot(x="gender",data = df,hue = "SeniorCitizen");
+plt.style.use("ggplot")
+plt.title("Figure 7: \n\n Customers Senior Citizens By Gender",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Senior Citizens",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("No.Of Customers",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#Tenure Histogram
+sns.histplot(data = df, x= "tenure",binwidth=3,bins=30,kde=True)
+plt.style.use("ggplot")
+plt.title("Figure 8: \n\n Distribution of Tenure",fontdict={"fontname":"Arial Black","fontsize":12,"fontweight":"bold"})
+plt.xlabel("Tenure(Months)",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("No Of Customers",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+#No.of Contract types
+contract_type = df["Contract"].value_counts()
+contract_type = contract_type.reset_index()
+contract_type.columns = ["Contract Type" , "Count"]
+print(contract_type)
+
+sns.catplot(y="Count",x="Contract Type",data= contract_type,palette="colorblind",height=5,aspect=2,kind="bar");
+plt.style.use("ggplot")
+plt.title("Figure 9: \n\n Distribution of Contract_Type",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Contract Type",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("No.Of Customers",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+#facet_grid for tenure histogram by contract type
+g=sns.FacetGrid(df,col="Contract")
+g.map(sns.histplot,"tenure")
+g.set_axis_labels("tenure(Months)","No.Of Customers")
+plt.figure(figsize =(8,5), dpi = 300)   
+plt.tight_layout()
+plt.show()
+
+
+#Distribution of various services used by customers
+services = ['PhoneService','MultipleLines','InternetService','OnlineSecurity',
+           'OnlineBackup','DeviceProtection','TechSupport','StreamingTV','StreamingMovies']
+
+fig, axes = plt.subplots(nrows = 3,ncols = 3,figsize = (15,12))
+for i, item in enumerate(services):
+    if i < 3:
+        ax = df[item].value_counts().plot(kind = 'bar',ax=axes[i,0],rot = 0)
+        
+    elif i >=3 and i < 6:
+        ax = df[item].value_counts().plot(kind = 'bar',ax=axes[i-3,1],rot = 0)
+        
+    elif i < 9:
+        ax = df[item].value_counts().plot(kind = 'bar',ax=axes[i-6,2],rot = 0)
+    ax.set_title(item)
+plt.show()
+
+
+#check relationship between monthly charges & total charges(scatter-plot)
+sns.scatterplot(x="MonthlyCharges",y="TotalCharges",data=df,palette="colorblind",hue="gender")
+plt.style.use("ggplot")
+plt.title("Figure 12: \n\n Relationship Between Monthly Charges & Total Charges",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Monthly Charges",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("Total Charges",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#distribution of churn (churn rate)
+churn_rate = df["Churn"].value_counts()
+churn_rate = churn_rate.reset_index()
+churn_rate.columns = ["Churn","Count"]
+print(churn_rate)
+
+sns.catplot(y="Count",x="Churn",data= churn_rate,palette="colorblind",height=5,aspect=2,kind="bar");
+plt.style.use("ggplot")
+plt.title("Figure 13: \n\n Distribution of Churn-Rate",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Churn",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("Count",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#Distribution of Churn by Contract Type
+df["Count"] = 1
+df.groupby(["Contract","Churn"]).count()["count"].reset_index()
+
+sns.countplot(x="Contract",data = df,hue = "Churn");
+plt.style.use("ggplot")
+plt.title("Figure 14: \n\n Distribution of Churn by Contract Type",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Contract",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("Churn",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#Distribution of Churn by Senior Citizens
+df["Count"] = 1
+df.groupby(["SeniorCitizen","Churn"]).count()["count"].reset_index()
+
+sns.countplot(x="SeniorCitizen",data = df,hue = "Churn");
+plt.style.use("ggplot")
+plt.title("Figure 15: \n\n Distribution of Churn by Senior Citizens",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.xlabel("Senior Citizens",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("Churn",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.legend()
+plt.show()
+
+
+#Distribution of Monthly Charges by Churn
+sns.kdeplot(data=df,x="MonthlyCharges",hue="Churn",multiple="stack")
+plt.style.use("ggplot")
+plt.title("Figure 16: \n\n Distribution of Monthly Charges by Churn",fontdict={"fontname":"Arial Black","fontsize":12,"fontweight":"bold"})
+plt.xlabel("Monthly Charges",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("Density",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.show()
+
+#Distribution of TotalCharges by Churn
+sns.kdeplot(data=df,x="TotalCharges",hue="Churn",multiple="stack")
+plt.style.use("ggplot")
+plt.title("Figure 17: \n\n Distribution of Total Charges by Churn",fontdict={"fontname":"Arial Black","fontsize":12,"fontweight":"bold"})
+plt.xlabel("Total Charges",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.ylabel("Density",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.show()
+
+
+#check for normality
+#monthly charges
+
+#1.visual normality check
+sns.histplot(data= df,x="MonthlyCharges",binwidth=3,bins=30,kde=True)
+
+#2.#2. quantile-quantile plot(qqplot)
+from statsmodels.graphics.gofplots import qqplot 
+
+qqplot(df.MonthlyCharges ,line="s")
+plt.show()
+
+#3. shapiro-wilk test but not accurate for large datasets
+from scipy.stats import shapiro
+
+stat, p232 = shapiro(df.MonthlyCharges)
+print("Statistics=%.3f, p=%.3f"  % (stat, p232))#not gaussian/normal distribution
+
+#4. D"Agostino's K2 Test 
+from scipy.stats import normaltest
+
+stat, p222 = normaltest(df.MonthlyCharges)
+print("Statistics=%.3f, p=%.3f"  % (stat, p222))
+#interpret
+alpha = 0.05
+if p222 > alpha:
+      print("Sample looks Gaussian (fail to reject H0)")
+else:
+      print("Sample Does Not looks Gaussian (reject H0)")      
+
+
+#TotalCharges
+#1.visual normality check
+sns.histplot(data= df,x="TotalCharges",binwidth=3,bins=30,kde=True)
+
+#2.#2. quantile-quantile plot(qqplot)
+from statsmodels.graphics.gofplots import qqplot 
+
+qqplot(df.TotalCharges ,line="s")
+plt.show()
+
+#3. shapiro-wilk test but not accurate for large datasets
+from scipy.stats import shapiro
+
+stat, p23 = shapiro(df.MonthlyCharges)
+print("Statistics=%.3f, p=%.3f"  % (stat, p23))#not gaussian/normal distribution
+
+#4. D"Agostino's K2 Test 
+from scipy.stats import normaltest
+
+stat, p2222 = normaltest(df.MonthlyCharges)
+print("Statistics=%.3f, p=%.3f"  % (stat, p2222))
+#interpret
+alpha = 0.05
+if p2222 > alpha:
+      print("Sample looks Gaussian (fail to reject H0)")
+else:
+      print("Sample Does Not looks Gaussian (reject H0)")      
+
+
+
+#Data Analysis 
+
+#independent T-test Analysis
+from scipy.stats import ttest_ind
+
+#check if there is a relationship btwn total charges & churn
+#plot boxplot
+sns.boxplot(x= "Churn",y= "TotalCharges",data=df)
+plt.title("Figure 18: \n\n Box-Plot to Check Indepent T-test",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.ylabel("Total Charges",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xlabel("Churn",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.figure(figsize =(8,5), dpi = 300)   
+plt.show()
+
+##H0: No significant difference in average total charges btwn no-churn & yes-churn
+##Ha: Significant difference in average total charges btwn no-churn & yes-churn
+
+#filter dataset into churn & no-churn
+churn = df.loc[df["Churn"] == "Yes","TotalCharges"]
+no_churn = df.loc[df["Churn"] == "No","TotalCharges"]
+
+#compare sample mean
+stat, p1 = ttest_ind(churn , no_churn)
+print("Statistics=%.3f,p=%.3f"  % ( stat, p1))
+
+#interpret
+alpha = 0.05
+if p1 > alpha:
+    print("Same distribution (fail to reject HO)")
+else:
+    print("Different distributions (reject HO, settle  for Ha)")
+
+round(churn.mean(),2)
+round(no_churn.mean(),2)
+
+
+#check if there is a relationship btwn Monthly Charges & churn
+#plot boxplot
+sns.boxplot(x= "Churn",y= "MonthlyCharges",data=df)
+plt.title("Figure 19: \n\n Box-Plot to Check Indepent T-test",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.ylabel("Monthly Charges",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xlabel("Churn",fontdict={"fontname":"Calibri","fontsize":12,"fontweight":"bold"})
+plt.xticks(rotation=0)
+plt.figure(figsize =(8,5), dpi = 300)   
+plt.show()
+
+##H0: No significant difference in average monthly charges btwn no-churn & yes-churn
+##Ha: Significant difference in average monthly charges btwn no-churn & yes-churn
+
+#filter dataset into churn & no-churn
+churn1 =  df.loc[df["Churn"] == "Yes","MonthlyCharges"]
+no_churn1 = df.loc[df["Churn"] == "No","MonthlyCharges"]
+
+#compare sample mean
+stat, p2 = ttest_ind(churn1 , no_churn1)
+print("Statistics=%.3f,p=%.3f"  % ( stat, p2))
+
+#interpret
+alpha = 0.05
+if p2 > alpha:
+    print("Same distribution (fail to reject HO)")
+else:
+    print("Different distributions (reject HO, settle  for Ha)")
+
+round(churn1.mean(),2)
+round(no_churn1.mean(),2)
+
+
+#pearsons chi-square analysis
+#import necessary libraries
+from scipy.stats import chi2_contingency
+from scipy.stats import chi2
+
+#churn & gender
+dataset_table = pd.crosstab(df["Churn"],df["gender"])
+print(dataset_table)
+
+##Ho:There is no association between Churn & gender
+##Ha:There is an association between Churn & gender    
+
+#calculate chi-squared test
+stat , p111, dof , expected = chi2_contingency(dataset_table)
+print("dof=%d"  % dof)
+print(expected)
+
+#interpret test-statistic
+prob = 0.95
+critical = chi2.ppf(prob, dof)
+print("probability=%.3f, critical=%.3f, stat=%.3f" % (prob, critical, stat))
+if abs(stat) >= critical:
+    print("Dependent (reject Ho)")
+else:
+    print("Independent (fail to reject Ho)")
+
+
+
+#correlation Analysis Of Continous Variables
+df_cor = df[["tenure","MonthlyCharges","TotalCharges"]]
+
+corr_matrix = round(df_cor.corr(),2)
+print(corr_matrix)
+
+sns.heatmap(corr_matrix,annot=True)
+plt.title("Figure 18: \n\n  Correlation Heatmap Analysis",fontdict={"fontname":"Arial Black","fontsize":"15","fontweight":"bold"})
+plt.figure(figsize =(8,5), dpi = 300)   
+plt.show() 
+
+#correlation analysis of "Churn" with other variables
+#convert predictor variable in a binary numeric variable
+df["Churn"].replace(to_replace="Yes",value = 1, inplace=True)
+df["Churn"].replace(to_replace="No",value = 0, inplace=True)
+
+#removing unnecessesary columns/variable
+df = df.drop(columns= ["count","Count"])
+
+#creating dummy variables
+df_dummies = pd.get_dummies(df)
+df_dummies.head()
+
+#get correlation of "Churn" with other variables
+plt.figure(figsize =(15,8))
+df_dummies.corr()["Churn"].sort_values(ascending= False).plot(kind ="bar")
+plt.show()
+
+
+#Regression
+#logical regression
+#import necessary libraries
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split 
+
+#we will use the data frame where we had created dummy variables
+y = df_dummies["Churn"]
+x = df_dummies.drop(columns=  ["Churn"])
+
+#split training & testing
+X_train, X_test ,y_train ,y_test = train_test_split(x , y ,test_size= 0.3,random_state=42)
+
+#running logistic regression model
+model = LogisticRegression()
+model.fit(X_train , y_train)
+
+#use model to predict test
+prediction = model.predict(X_test.values)
+print(prediction)
+
+#score this model
+model.score(X_test.values,y_test.values)
+
+
+#Random Forest
+from sklearn.ensemble import RandomForestClassifier
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=101)
+model_rf = RandomForestClassifier(n_estimators=1000 , oob_score = True, n_jobs = -1,
+                                  random_state =50, max_features = "auto",
+                                  max_leaf_nodes = 30)
+model_rf.fit(X_train, y_train)
+
+# Make predictions
+prediction_test = model_rf.predict(X_test)
+print(prediction_test)
+
+importances = model_rf.feature_importances_
+weights = pd.Series(importances,
+                 index=x.columns.values)
+weights.sort_values()[-10:].plot(kind = 'barh')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
